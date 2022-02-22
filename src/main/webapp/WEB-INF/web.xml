@@ -19,4 +19,35 @@
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>servlet-example</servlet-name>
+        <servlet-class>org.velikokhatko.part2.ServletExample</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>servlet-example</servlet-name>
+        <url-pattern>/velikokhatko/servlet/example</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>filter1example</filter-name>
+        <filter-class>org.velikokhatko.part2.Filter1Example</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>filter1example</filter-name>
+        <url-pattern>/velikokhatko/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>filter2example</filter-name>
+        <filter-class>org.velikokhatko.part2.Filter2Example</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>filter2example</filter-name>
+        <url-pattern>/velikokhatko/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>org.velikokhatko.part2.Listener1Example</listener-class>
+    </listener>
 </web-app>
