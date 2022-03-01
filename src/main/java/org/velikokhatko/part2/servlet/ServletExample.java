@@ -1,4 +1,4 @@
-package org.velikokhatko.part2;
+package org.velikokhatko.part2.servlet;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

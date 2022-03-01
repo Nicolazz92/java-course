@@ -1,4 +1,4 @@
-package org.velikokhatko.part2;
+package org.velikokhatko.part2.servlet;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
