@@ -2,41 +2,45 @@ package org.velikokhatko.part2.blocking.queue;
 
 import java.util.*;
 
-public class QqqqExample {
+public class ExecutorExample {
 
     public static void main(String[] args) {
-        QqqqExample qqqqExample = new QqqqExample();
-        BlockingQueue blockingQueue = qqqqExample.new BlockingQueue();
+        ExecutorExample executorExample = new ExecutorExample();
+        Executor executor = executorExample.new Executor();
         for (int i = 0; i < 50; i++) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            boolean offer = blockingQueue.offer(() -> {
-                String uuid = UUID.randomUUID().toString();
-                String taskId = uuid.substring(uuid.lastIndexOf('-') + 1);
-                System.out.printf("Task %s started%n", taskId);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.printf("Task %s finished%n", taskId);
-            });
+            boolean offer = executor.offer(getRunnable());
             if (!offer) {
                 System.out.println("Queue is full");
             }
         }
     }
 
-    public class BlockingQueue {
-        private static final int THREADS_SIZE = 2;
+    private static Runnable getRunnable() {
+        return () -> {
+            String uuid = UUID.randomUUID().toString();
+            String taskId = uuid.substring(uuid.lastIndexOf('-') + 1);
+            System.out.printf("Task %s started%n", taskId);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.printf("Task %s finished%n", taskId);
+        };
+    }
+
+    public class Executor {
+        private static final int THREAD_POOL_SIZE = 2;
         private static final int QUEUE_SIZE = 2;
         private final Queue<Runnable> queue = new LinkedList<>();
-        private final Set<Thread> threads = new HashSet<>();
+        private final Set<Thread> threadPool = new HashSet<>();
 
-        public BlockingQueue() {
+        public Executor() {
             new Thread(() -> {
                 while (true) {
                     get();
@@ -45,8 +49,8 @@ public class QqqqExample {
         }
 
         public synchronized void get() {
-            threads.removeIf(thread -> !thread.isAlive() || thread.isInterrupted());
-            if (threads.size() >= THREADS_SIZE) {
+            threadPool.removeIf(thread -> !thread.isAlive() || thread.isInterrupted());
+            if (threadPool.size() >= THREAD_POOL_SIZE) {
                 return;
             }
             if (queue.isEmpty()) {
@@ -59,7 +63,7 @@ public class QqqqExample {
                 Runnable poll = queue.poll();
                 if (poll != null) {
                     Thread thread = new Thread(poll);
-                    threads.add(thread);
+                    threadPool.add(thread);
                     thread.start();
                 }
             }
