@@ -7,7 +7,6 @@ public class BlockingQueueExample {
     public static void main(String[] args) {
         BlockingQueueExample blockingQueueExample = new BlockingQueueExample();
         BlockingQueue blockingQueue = blockingQueueExample.new BlockingQueue();
-        blockingQueue.start();
         for (int i = 0; i < 50; i++) {
             try {
                 Thread.sleep(100);
@@ -37,7 +36,7 @@ public class BlockingQueueExample {
         private final Queue<Runnable> queue = new LinkedList<>();
         private final Set<Thread> threads = new HashSet<>();
 
-        public void start() {
+        public BlockingQueue() {
             new Thread(() -> {
                 while (true) {
                     get();
