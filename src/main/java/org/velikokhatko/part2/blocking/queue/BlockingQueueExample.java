@@ -8,8 +8,13 @@ public class BlockingQueueExample {
         BlockingQueueExample blockingQueueExample = new BlockingQueueExample();
         BlockingQueue blockingQueue = blockingQueueExample.new BlockingQueue();
         blockingQueue.start();
-        for (int i = 0; i < 10; i++) {
-            blockingQueue.put(() -> {
+        for (int i = 0; i < 50; i++) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            boolean offer = blockingQueue.offer(() -> {
                 String uuid = UUID.randomUUID().toString();
                 String taskId = uuid.substring(uuid.lastIndexOf('-') + 1);
                 System.out.printf("Task %s started%n", taskId);
@@ -20,11 +25,15 @@ public class BlockingQueueExample {
                 }
                 System.out.printf("Task %s finished%n", taskId);
             });
+            if (!offer) {
+                System.out.println("Queue is full");
+            }
         }
     }
 
     public class BlockingQueue {
         private static final int THREADS_SIZE = 2;
+        private static final int QUEUE_SIZE = 2;
         private final Queue<Runnable> queue = new LinkedList<>();
         private final Set<Thread> threads = new HashSet<>();
 
@@ -57,9 +66,13 @@ public class BlockingQueueExample {
             }
         }
 
-        public synchronized void put(Runnable task) {
+        public synchronized boolean offer(Runnable task) {
+            if (queue.size() >= QUEUE_SIZE) {
+                return false;
+            }
             queue.add(task);
             notify();
+            return true;
         }
     }
 }
