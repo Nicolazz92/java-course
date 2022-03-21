@@ -1,16 +1,20 @@
 package org.velikokhatko.part2.blocking.queue;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.UUID;
+
+import static org.velikokhatko.part2.blocking.queue.Utils.getRunnable;
 
 public class BlockingQueueExample {
 
     public static void main(String[] args) {
         BlockingQueueExample blockingQueueExample = new BlockingQueueExample();
-        BlockingQueue blockingQueue = blockingQueueExample.new BlockingQueue();
+        BlockingQueue<Runnable> blockingQueue = blockingQueueExample.new BlockingQueue<>();
 
         new Thread(() -> {
             while (true) {
-                new Thread(blockingQueue.get()).start();
+                new Thread(blockingQueue.poll()).start();
             }
         }).start();
 
@@ -22,25 +26,12 @@ public class BlockingQueueExample {
         }
     }
 
-    private static Runnable getRunnable() {
-        return () -> {
-            String uuid = UUID.randomUUID().toString();
-            String taskId = uuid.substring(uuid.lastIndexOf('-') + 1);
-            System.out.printf("Task %s started%n", taskId);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.printf("Task %s finished%n", taskId);
-        };
-    }
-
-    public class BlockingQueue {
+    public class BlockingQueue<R extends Runnable> extends AbstractBlockingQueue<R> {
         private static final int QUEUE_SIZE = 2;
-        private final Queue<Runnable> queue = new LinkedList<>();
+        private final Queue<R> queue = new LinkedList<>();
 
-        public synchronized Runnable get() {
+        @Override
+        public synchronized R poll() {
             if (queue.isEmpty()) {
                 try {
                     wait();
@@ -51,12 +42,13 @@ public class BlockingQueueExample {
             return queue.poll();
         }
 
-        public synchronized boolean offer(Runnable task) {
+        @Override
+        public synchronized boolean offer(R task) {
             if (queue.size() >= QUEUE_SIZE) {
                 return false;
             }
             queue.add(task);
-            notify();
+            notifyAll();
             return true;
         }
     }

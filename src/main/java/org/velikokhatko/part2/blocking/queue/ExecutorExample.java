@@ -2,6 +2,8 @@ package org.velikokhatko.part2.blocking.queue;
 
 import java.util.*;
 
+import static org.velikokhatko.part2.blocking.queue.Utils.getRunnable;
+
 public class ExecutorExample {
 
     public static void main(String[] args) {
@@ -20,23 +22,9 @@ public class ExecutorExample {
         }
     }
 
-    private static Runnable getRunnable() {
-        return () -> {
-            String uuid = UUID.randomUUID().toString();
-            String taskId = uuid.substring(uuid.lastIndexOf('-') + 1);
-            System.out.printf("Task %s started%n", taskId);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.printf("Task %s finished%n", taskId);
-        };
-    }
-
     public class Executor {
         private static final int THREAD_POOL_SIZE = 2;
-        private static final int QUEUE_SIZE = 2;
+        private static final int QUEUE_SIZE = 3;
         private final Queue<Runnable> queue = new LinkedList<>();
         private final Set<Thread> threadPool = new HashSet<>();
 
@@ -74,7 +62,7 @@ public class ExecutorExample {
                 return false;
             }
             queue.add(task);
-            notify();
+            notifyAll();
             return true;
         }
     }
