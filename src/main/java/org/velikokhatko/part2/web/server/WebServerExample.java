@@ -3,7 +3,6 @@ package org.velikokhatko.part2.web.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.UUID;
 
 public class WebServerExample {
     private static final int PORT = 1488;
