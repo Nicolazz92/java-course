@@ -57,6 +57,7 @@ public class WebServerExample {
                 tryClose(bufferedReader);
                 tryClose(inputStream);
                 tryClose(clientSocket);
+                System.out.println();
             }
         }
 
