@@ -20,6 +20,7 @@ public class WebServerExample {
 
     public static class ExtSocketThread extends Thread {
         Socket clientSocket;
+        BufferedReader bufferedReader;
 
         public ExtSocketThread(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -27,7 +28,8 @@ public class WebServerExample {
 
         @Override
         public void run() {
-            try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
+            try {
+                bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 while (bufferedReader.ready()) {
                     final String line = bufferedReader.readLine();
                     System.out.println(line);
@@ -44,11 +46,16 @@ public class WebServerExample {
             } catch (Throwable e) {
                 e.printStackTrace();
             } finally {
-                try {
-                    clientSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                tryClose(bufferedReader);
+                tryClose(clientSocket);
+            }
+        }
+
+        private void tryClose(Closeable closeable) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
