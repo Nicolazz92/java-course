@@ -10,9 +10,6 @@ public class WebServerExample {
     private static final int PORT = 1488;
 
     public static void main(String[] args) {
-
-        System.out.println((char) 10);
-
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.printf("Socket is ready to serve on port %d...\n", PORT);
             while (true) {
@@ -38,32 +35,37 @@ public class WebServerExample {
         public void run() {
             try {
                 inputStream = clientSocket.getInputStream();
-                int buffSize = 1;
-                byte[] buffer = new byte[buffSize];
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                int realBufferLength;
-                while ((realBufferLength = inputStream.read(buffer)) > -1) {
-                    bytes.write(buffer, 0, realBufferLength);
-                    System.out.println(realBufferLength);
-                    System.out.println(Arrays.toString(buffer));
-                    if (bytes.toString(Charset.defaultCharset()).endsWith(new String(new char[]{10, 13, 10}))) {
-                        System.out.println("ПОЙМАЛ");
-                    }
-                    if (realBufferLength < buffSize || inputStream.available() == -1) {
-                        break;
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                Integer contentLength = 0;
+                boolean flagStopReadingHeaders = false;
+                for (byte[] b = new byte[1]; !flagStopReadingHeaders && inputStream.read(b) > -1; ) {
+                    byteArrayOutputStream.write(b);
+                    if (byteArrayOutputStream.toString(Charset.defaultCharset())
+                            .endsWith(new String(new char[]{10, 13, 10}))) {
+                        String[] corteges = byteArrayOutputStream.toString().split("\n");
+                        contentLength = Arrays.stream(corteges)
+                                .filter(c -> c.startsWith("Content-Length: "))
+                                .map(c -> c.substring(c.indexOf(":") + 2, c.indexOf("\r")))
+                                .map(Integer::valueOf)
+                                .filter(i -> i > 0)
+                                .reduce(0, Integer::sum, Integer::sum);
+                        flagStopReadingHeaders = true;
                     }
                 }
-                System.out.println(bytes.toString(Charset.defaultCharset()));
-                //TODO https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
-                // считать header, вывести их, найти конец хедеров, найти контент-ленгт, считать боди.
+                System.out.println("-------------------- HEADERS -------------------");
+                System.out.println(byteArrayOutputStream);
+                System.out.println("------------------- /HEADERS -------------------");
 
-//                while (inputStream.available() >= 0)
-//                inputStream.available()
-//                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-//                while (bufferedReader.ready()) {
-//                    final String line = bufferedReader.readLine();
-//                    System.out.println(line);
-//                }
+                if (contentLength > 0) {
+                    byte[] body = new byte[contentLength];
+                    inputStream.read(body);
+                    System.out.println("---------------------  BODY  -------------------");
+                    System.out.println(new String(body, Charset.defaultCharset()));
+                    System.out.println("--------------------- /BODY  -------------------");
+                } else {
+                    System.out.println("Request has no body");
+                }
+                tryClose(byteArrayOutputStream);
 
                 outputStream = clientSocket.getOutputStream();
                 printWriter = new PrintWriter(outputStream);
