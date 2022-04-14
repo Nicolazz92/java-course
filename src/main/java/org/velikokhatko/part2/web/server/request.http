@@ -2,3 +2,30 @@ GET http://localhost:1488/
 Accept: application/json
 
 ###
+POST http://localhost:1488/
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary--
+Content-Disposition: form-data; name="parameters"
+Content-Type: application/json
+
+{"asGuid":"12345","user":"Vasya","version":1}
+
+###
+PUT http://localhost:1488/
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary--
+Content-Disposition: form-data; name="parameters"
+Content-Type: application/json
+
+{"asGuid":"12345","user":"Vasya"}
+
+--WebAppBoundary--
+Content-Disposition: form-data; name="draft"; filename="gaudi_draw.json"
+Content-Type: application/json
+
+< ./gaudi_draw.json
+--WebAppBoundary--
+
+###
