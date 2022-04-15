@@ -22,7 +22,6 @@ public class WebServerExample {
 
     public static class ExtSocketThread extends Thread {
         Socket clientSocket;
-        BufferedReader bufferedReader;
         InputStream inputStream;
         OutputStream outputStream;
         PrintWriter printWriter;
