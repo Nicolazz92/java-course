@@ -17,6 +17,7 @@
         <rest-assured.version>4.4.0</rest-assured.version>
         <slf4j.version>1.7.13</slf4j.version>
         <jackson.version>2.12.5</jackson.version>
+        <com.squareup.retrofit2.version>2.4.0</com.squareup.retrofit2.version>
     </properties>
 
     <dependencies>
@@ -134,7 +135,14 @@
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-web-api</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -335,6 +343,18 @@
                 <artifactId>jakarta.jakartaee-web-api</artifactId>
                 <version>9.0.0</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.retrofit2</groupId>
+                <artifactId>retrofit</artifactId>
+                <version>${com.squareup.retrofit2.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.retrofit2</groupId>
+                <artifactId>converter-gson</artifactId>
+                <version>${com.squareup.retrofit2.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -29,6 +29,15 @@
         <url-pattern>/velikokhatko/servlet/example</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>servletPerformanceTesting</servlet-name>
+        <servlet-class>org.velikokhatko.part2.servlet.ServletPerformanceTesting</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>servletPerformanceTesting</servlet-name>
+        <url-pattern>/velikokhatko/servlet/performance</url-pattern>
+    </servlet-mapping>
+
     <filter>
         <filter-name>filter1example</filter-name>
         <filter-class>org.velikokhatko.part2.servlet.Filter1Example</filter-class>
