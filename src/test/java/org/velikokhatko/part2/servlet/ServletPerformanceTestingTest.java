@@ -26,7 +26,7 @@ public class ServletPerformanceTestingTest {
 
         ServletPerformanceTestingApi api = retrofit.create(ServletPerformanceTestingApi.class);
 
-        IntStream.range(0, 500)
+        IntStream.range(0, 100)
                 .parallel()
                 .mapToObj(a -> {
                     try {

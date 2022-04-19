@@ -33,53 +33,65 @@ public class WebServerExample {
         @Override
         public void run() {
             try {
+                clientSocket.setSoTimeout(3000);
                 inputStream = clientSocket.getInputStream();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                Integer contentLength = 0;
-                boolean flagStopReadingHeaders = false;
-                for (byte[] b = new byte[1]; !flagStopReadingHeaders && inputStream.read(b) > -1; ) {
-                    byteArrayOutputStream.write(b);
-                    if (byteArrayOutputStream.toString(Charset.defaultCharset())
-                            .endsWith(new String(new char[]{10, 13, 10}))) {
-                        String[] corteges = byteArrayOutputStream.toString().split("\n");
-                        contentLength = Arrays.stream(corteges)
-                                .filter(c -> c.startsWith("Content-Length: "))
-                                .map(c -> c.substring(c.indexOf(":") + 2, c.indexOf("\r")))
-                                .map(Integer::valueOf)
-                                .filter(i -> i > 0)
-                                .reduce(0, Integer::sum, Integer::sum);
-                        flagStopReadingHeaders = true;
+                while (true) {
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    Integer contentLength = 0;
+                    boolean flagStopReadingHeaders = false;
+                    for (byte[] b = new byte[1]; !flagStopReadingHeaders && inputStream.read(b) > -1; ) {
+                        byteArrayOutputStream.write(b);
+                        if (byteArrayOutputStream.toString(Charset.defaultCharset())
+                                .endsWith(new String(new char[]{10, 13, 10}))) {
+                            String[] corteges = byteArrayOutputStream.toString().split("\n");
+                            contentLength = Arrays.stream(corteges)
+                                    .filter(c -> c.startsWith("Content-Length: "))
+                                    .map(c -> c.substring(c.indexOf(":") + 2, c.indexOf("\r")))
+                                    .map(Integer::valueOf)
+                                    .filter(i -> i > 0)
+                                    .reduce(0, Integer::sum, Integer::sum);
+                            flagStopReadingHeaders = true;
+                        }
                     }
-                }
-                System.out.println("-------------------- HEADERS -------------------");
-                System.out.println(byteArrayOutputStream);
-                System.out.println("------------------- /HEADERS -------------------");
+                    System.out.println("-------------------- HEADERS -------------------");
+                    System.out.println(byteArrayOutputStream);
+                    System.out.println("------------------- /HEADERS -------------------");
 
-                if (contentLength > 0) {
-                    byte[] body = new byte[contentLength];
-                    inputStream.read(body);
-                    System.out.println("---------------------  BODY  -------------------");
-                    System.out.println(new String(body, Charset.defaultCharset()));
-                    System.out.println("--------------------- /BODY  -------------------");
-                } else {
-                    System.out.println("Request has no body");
-                }
-                tryClose(byteArrayOutputStream);
+                    if (contentLength > 0) {
+                        byte[] body = new byte[contentLength];
+                        inputStream.read(body);
+                        System.out.println("---------------------  BODY  -------------------");
+                        System.out.println(new String(body, Charset.defaultCharset()));
+                        System.out.println("--------------------- /BODY  -------------------");
+                    } else {
+                        System.out.println("Request has no body");
+                    }
+                    tryClose(byteArrayOutputStream);
 
-                outputStream = clientSocket.getOutputStream();
-                printWriter = new PrintWriter(outputStream);
-                try {
-                    printWriter.println("HTTP/1.1 200 Ok");
-                    printWriter.println("Content-Type: text/html; charset=utf-8");
-                    printWriter.println();
-                    printWriter.println("Нормально: " + Thread.currentThread().getId());
-                    printWriter.flush();
-                } finally {
+                    outputStream = clientSocket.getOutputStream();
+                    printWriter = new PrintWriter(outputStream);
+                    try {
+                        String body = "Нормально: " + Thread.currentThread().getId();
+                        int length = body.length();
+
+                        printWriter.println("HTTP/1.1 200 Ok");
+                        printWriter.println("Content-Type: text/html; charset=utf-8");
+                        printWriter.println("Content-Length: " + length);
+                        printWriter.println();
+                        printWriter.println(body);
+                        printWriter.println();
+                        printWriter.flush();
+                    } finally {
 //                    tryClose(printWriter);
 //                    tryClose(outputStream);
+                    }
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
+                tryClose(printWriter);
+                tryClose(outputStream);
+                tryClose(inputStream);
+                tryClose(clientSocket);
             } finally {
 //                tryClose(bufferedReader);
 //                tryClose(inputStream);

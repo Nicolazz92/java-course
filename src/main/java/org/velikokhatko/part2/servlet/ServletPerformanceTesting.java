@@ -6,16 +6,17 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalTime;
 
 public class ServletPerformanceTesting extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            Thread.sleep(100);
+            Thread.sleep(1000);
             resp.setStatus(200);
             PrintWriter writer = resp.getWriter();
-            writer.print("{message: 'all is ok, thread №" + Thread.currentThread().getId() + "'}");
+            writer.print("{message: 'all is ok, time " + LocalTime.now() + " thread №" + Thread.currentThread().getId() + "'}");
             writer.flush();
             writer.close();
         } catch (InterruptedException e) {
