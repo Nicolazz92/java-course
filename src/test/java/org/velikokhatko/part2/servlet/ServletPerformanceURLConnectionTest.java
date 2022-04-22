@@ -39,6 +39,7 @@ public class ServletPerformanceURLConnectionTest {
                 }
             });
         }
+
         executorService.shutdown();
         Assert.assertTrue(executorService.awaitTermination(100, TimeUnit.SECONDS));
     }

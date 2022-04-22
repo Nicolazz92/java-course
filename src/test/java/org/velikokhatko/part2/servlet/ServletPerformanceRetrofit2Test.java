@@ -25,7 +25,6 @@ public class ServletPerformanceRetrofit2Test {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://localhost:8080/java_training_war/")
-                //TODO попрoбовать socket timeout
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
