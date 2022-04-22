@@ -1,43 +1,39 @@
 package org.velikokhatko.part2.servlet;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.Assert;
 import org.junit.Test;
-import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Objects;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-//TODO попрoбовать клиент на URLConnection
 public class ServletPerformanceURLConnectionTest {
+    private static final String BASE_URL = "http://localhost:8080/java_training_war";
+    private static final String ADDICTION_URL = "velikokhatko/servlet/performance";
 
     @Test
     public void doGet() throws InterruptedException {
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8080/java_training_war/")
-                //TODO попрoбовать socket timeout
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        ServletPerformanceTestingApi api = retrofit.create(ServletPerformanceTestingApi.class);
-
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 100; i++) {
+
+        for (int i = 0; i < 10; i++) {
             executorService.submit(() -> {
                 try {
-                    ServletPerformanceTestingApi.Resp resp = api.checkPerformance().execute().body();
-                    System.out.println(Objects.requireNonNull(resp).message);
+                    URLConnection connection = new URL(String.join("/", BASE_URL, ADDICTION_URL)).openConnection();
+                    connection.setConnectTimeout(2000);
+                    InputStream inputStream = connection.getInputStream();
+                    try (InputStreamReader in = new InputStreamReader(inputStream);
+                         BufferedReader bufferedReader = new BufferedReader(in)) {
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            System.out.println(line);
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -45,15 +41,5 @@ public class ServletPerformanceURLConnectionTest {
         }
         executorService.shutdown();
         Assert.assertTrue(executorService.awaitTermination(100, TimeUnit.SECONDS));
-    }
-
-    private interface ServletPerformanceTestingApi {
-
-        @GET("velikokhatko/servlet/performance")
-        Call<Resp> checkPerformance();
-
-        class Resp {
-            public String message;
-        }
     }
 }
