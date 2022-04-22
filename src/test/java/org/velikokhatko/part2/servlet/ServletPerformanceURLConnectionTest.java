@@ -26,6 +26,7 @@ public class ServletPerformanceURLConnectionTest {
                 try {
                     URLConnection connection = new URL(String.join("/", BASE_URL, ADDICTION_URL)).openConnection();
                     connection.setConnectTimeout(2000);
+                    connection.setDoInput(true);
                     InputStream inputStream = connection.getInputStream();
                     try (InputStreamReader in = new InputStreamReader(inputStream);
                          BufferedReader bufferedReader = new BufferedReader(in)) {
