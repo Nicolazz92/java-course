@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-public class HashMapVelTest {
+public class HashMapVelITCase {
 
     public static void main(String[] args) {
         int capacity = 1000000;
