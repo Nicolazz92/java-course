@@ -1,9 +1,7 @@
 package org.velikokhatko.structures.map.hash;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HashMapVel<K, V> {
@@ -12,22 +10,22 @@ public class HashMapVel<K, V> {
 
     private List<Pair<K, V>>[] buckets;
 
-    public HashMapVel(int capacity) {
-        buckets = new List[capacity];
-    }
-
     public HashMapVel() {
-        int defaultCapacity = 16;
+        int defaultCapacity = 1 << 4;
         buckets = new List[defaultCapacity];
     }
 
     public V get(K key) {
         int keyHash = key.hashCode();
         int bucketNumber = getBucketNumber(keyHash, buckets);
-        return buckets[bucketNumber].stream()
-                .filter(kvPair -> kvPair.key.equals(key))
-                .map(Pair::value)
-                .findFirst().orElse(null);
+        List<Pair<K, V>> bucket = buckets[bucketNumber];
+        for (int i = 0; i < bucket.size(); i++) {
+            Pair<K, V> kvPair = bucket.get(i);
+            if (kvPair.key.equals(key)) {
+                return kvPair.value();
+            }
+        }
+        return null;
     }
 
     public void put(K key, V value) {
@@ -49,17 +47,21 @@ public class HashMapVel<K, V> {
     }
 
     private int getBucketNumber(int keyHash, List<Pair<K, V>>[] buckets) {
-        return Math.abs(keyHash % buckets.length);
+        return keyHash & (buckets.length - 1);
     }
 
     private void expansion() {
-        List<Pair<K, V>>[] newBuckets = new List[buckets.length * 2];
+        List<Pair<K, V>>[] newBuckets = new List[buckets.length << 1];
         AtomicInteger newCapacity = new AtomicInteger();
-        Arrays.stream(buckets).filter(Objects::nonNull).forEach(bucket -> {
-            for (Pair<K, V> pair : bucket) {
-                put(newBuckets, newCapacity, pair.key, pair.value);
+        for (int i = 0, bucketsLength = buckets.length; i < bucketsLength; i++) {
+            List<Pair<K, V>> bucket = buckets[i];
+            if (bucket != null) {
+                for (int j = 0; j < bucket.size(); j++) {
+                    Pair<K, V> pair = bucket.get(j);
+                    put(newBuckets, newCapacity, pair.key, pair.value);
+                }
             }
-        });
+        }
         buckets = newBuckets;
         currentCapacity = newCapacity;
     }
