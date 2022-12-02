@@ -12,5 +12,8 @@ public class SpringAnnotatedApplication {
         AnnotationConfigApplicationContext annotatedContext = new AnnotationConfigApplicationContext(AnnotatedConfiguration.class);
         AnyService anyService = annotatedContext.getBean("anyServiceAnnotatedBean", AnyService.class);
         Assert.notNull(anyService, "Мы сюда даже не дойдём, если всё пизданётся");
+
+        String hello = annotatedContext.getBean("sayHello", String.class);
+        Assert.notNull(hello, "Мы сюда даже не дойдём, если всё пизданётся");
     }
 }

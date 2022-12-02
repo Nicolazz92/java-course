@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class AbstractBlockingQueue<R> implements BlockingQueue<R> {
+public abstract class AbstractBlockingQueue<R> implements BlockingQueue<R> {
     @Override
     public boolean add(R r) {
         throw new UnsupportedOperationException();
