@@ -10,20 +10,10 @@ import java.util.stream.IntStream;
 public class HashMapVelITCase {
 
     public static void main(String[] args) {
-        int capacity = 1000000;
+        int capacity = 10000;
 
         velMathodCall(capacity);
-        velMathodCall(capacity);
         normMethodCall(capacity);
-        normMethodCall(capacity);
-
-        long beforeVel = System.nanoTime();
-        long afterVel = velMathodCall(capacity);
-        System.out.println((afterVel - beforeVel));
-
-        long beforeNorm = normMethodCall(capacity);
-        long afterNorm = System.nanoTime();
-        System.out.println((afterNorm - beforeNorm));
     }
 
     private static long normMethodCall(int capacity) {
